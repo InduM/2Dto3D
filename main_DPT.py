@@ -59,15 +59,15 @@ depth_max = prediction.max()
 normalized_depth = (prediction - depth_min) / (depth_max - depth_min)
 
 
-# Step 1: Get original image and depth map
+#Get original image and depth map
 rgb_image = np.array(image)  # From PIL image
 depth_map = normalized_depth.astype(np.float32)
 
-# Step 2: Convert to Open3D image format
+# Convert to Open3D image format
 rgb_o3d = o3d.geometry.Image(rgb_image)
 depth_o3d = o3d.geometry.Image((depth_map * 1000).astype(np.uint16))  # Scale to millimeters
 
-# Step 3: Create RGBD image
+# Create RGBD image
 rgbd_image = o3d.geometry.RGBDImage.create_from_color_and_depth(
     color=rgb_o3d,
     depth=depth_o3d,
@@ -76,7 +76,7 @@ rgbd_image = o3d.geometry.RGBDImage.create_from_color_and_depth(
     depth_trunc=3.0      # Truncate distances beyond 3 meters
 )
 
-# Step 4: Define camera intrinsics
+# Define camera intrinsics
 # Focal lengths and principal point (assumes fx = fy and center = image center)
 ## Assuming a simple pinhole camera model
 
@@ -86,7 +86,7 @@ cx = width / 2
 cy = height / 2
 intrinsic = o3d.camera.PinholeCameraIntrinsic(width, height, fx, fy, cx, cy)
 
-# Step 5: Generate point cloud
+#  Generate point cloud
 ## Calculate 3D coordinates
 #z = depth_map
 #x = (x - cx) * z / fx
@@ -116,7 +116,7 @@ mesh, densities = o3d.geometry.TriangleMesh.create_from_point_cloud_poisson(pcd,
 
 
 
-# Optional: Crop mesh to the original bounding box
+# Crop mesh to the original bounding box
 bbox = pcd.get_axis_aligned_bounding_box()
 mesh = mesh.crop(bbox)
 
@@ -129,7 +129,7 @@ o3d.io.write_triangle_mesh("mesh_output.obj", mesh)
 
 print("Mesh saved as mesh_output.obj")
 
-# Step 6: Visualize the point cloud
+# Visualize the point cloud
 #o3d.visualization.draw_geometries([pcd]) ## the results looks very goood 
 visualize_obj_model("mesh_output.obj")
 
